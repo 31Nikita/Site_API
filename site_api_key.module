@@ -1,0 +1,31 @@
+<?php
+/**
+ * Implements hook_form_alter().
+ */
+use Drupal\node\NodeInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Drupal\Core\Form\FormStateInterface;
+
+function site_api_key_form_alter(&$form, &$form_state, $form_id)
+{
+
+    // Add Site API Key field to 'Site Information' section
+    if ($form_id == 'system_site_information_settings')
+    {
+        $form['site_api'] = [
+          '#type' => 'details',
+          '#title' => t('Site API section') ,
+          '#open' => true,
+        ];
+        $config = \Drupal::service('config.factory')->getEditable('system.site');
+
+        $form['site_api']['site_api_key'] = [
+          '#type' => 'textfield',
+          '#title' => t('Site API key') ,
+          '#default_value' => $config->get('site_api_key') ? $config->get('site_api_key') : NULL,
+          '#size' => 40,
+          '#description' => t('Enter the key') ];
+        // Change form submit button text to 'Update configuration'
+        $site_api_key = $config->get('site_api_key');
+        }
+  }
