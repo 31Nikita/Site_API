@@ -27,5 +27,32 @@ function site_api_key_form_alter(&$form, &$form_state, $form_id)
           '#description' => t('Enter the key') ];
         // Change form submit button text to 'Update configuration'
         $site_api_key = $config->get('site_api_key');
+        if (!empty($site_api_key))
+        {
+            $form['actions']['submit']['#value'] = t('Update configuration');
         }
-  }
+        // Extra submit handler to save/update site_api_key
+        $form['#submit'][] = 'site_api_key_submit';
+    } 
+}
+
+function site_api_key_submit(array & $form, FormStateInterface $form_state)
+{
+    $site_api_key = NULL;
+    // Update the site information variable "site_api_key"
+    $config = \Drupal::service('config.factory')->getEditable('system.site');
+    $site_api_key = $form_state->getValue('site_api_key');
+    if ($site_api_key)
+    {
+
+        $config->set('site_api_key', $site_api_key)->save();
+        // Show message that Site API Key has been updated.
+        drupal_set_message("Site API key to " . $site_api_key . " has been updated successfully.");
+    }
+    else
+    {
+        drupal_set_message("No site API key has been set");
+        $config->set('site_api_key', $site_api_key)->save();
+
+    }
+}
